@@ -2,17 +2,16 @@ services:
   - type: web
     name: moodmagic-api
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      python -c "import secrets; print(f'JWT_SECRET={secrets.token_urlsafe(32)}')" > .env
+    region: oregon  # Choose the region closest to your users
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
       - key: APP_NAME
         value: MoodMagic
       - key: APP_ENV
         value: production
-      - key: BASE_URL
-        value: https://moodmagic.onrender.com
       - key: OPENAI_API_KEY
         sync: false
       - key: SERPAPI_KEY
@@ -21,14 +20,14 @@ services:
         fromDatabase:
           name: moodmagic-db
           property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
       - key: CORS_ORIGINS
-        value: https://moodmagic.app,http://localhost:3000,https://moodmagic.onrender.com
-      - key: PORT
-        value: 10000
+        value: https://moodmagic.app,http://localhost:3000
 
 databases:
   - name: moodmagic-db
     databaseName: moodmagic
     user: moodmagic
-    plan: free 
+    plan: free  # Upgrade to higher tier for production 
     

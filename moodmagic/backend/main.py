@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
+from sqlalchemy.sql import func
 import os
 from typing import List
 from pydantic import BaseModel
@@ -24,22 +25,26 @@ Base = declarative_base()
 # Database models
 class User(Base):
     __tablename__ = "users"
+    
+    # Define columns with explicit SQLAlchemy types
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    email = Column(String(255), unique=True, index=True)
+    hashed_password = Column(String(255))
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    subscription_tier = Column(String, default="free")
+    created_at = Column(DateTime, default=func.now())
+    subscription_tier = Column(String(50), default="free")
 
 class Moodboard(Base):
     __tablename__ = "moodboards"
+    
+    # Define columns with explicit SQLAlchemy types
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    description = Column(String)
+    title = Column(String(255))
+    description = Column(String(1000))
     content = Column(JSON)
     user_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
 # Create tables
 Base.metadata.create_all(bind=engine)
