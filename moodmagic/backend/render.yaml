@@ -31,3 +31,4 @@ databases:
     databaseName: moodmagic
     user: moodmagic
     plan: free 
+    
