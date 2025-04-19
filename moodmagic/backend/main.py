@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey, JSON
-from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.sql import func
 import os
 from typing import List
@@ -17,8 +18,7 @@ from pinterest_api import fetch_pinterest_images
 ai_generator = AIGenerator()
 
 # Database setup
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL_ASYNC, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -68,7 +68,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.CORS_ORIGINS_LIST,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
